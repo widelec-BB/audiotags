@@ -37,15 +37,22 @@ func main() {
 		return
 	}
 
-	props, audioProps, err := audiotags.Read(os.Args[1])
+	f, err := audiotags.Open(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	props := f.ReadTags()
 	for k, v := range props {
 		fmt.Printf("%s %s\n", k, strings.Replace(strings.Replace(v, "\r\n", "\\n", -1), "\n", "\\n", -1))
 	}
 
+	audioProps := f.ReadAudioProperties()
 	fmt.Printf("length %d\nbitrate %d\nsamplerate %d\nchannels %d\n",
 		audioProps.Length, audioProps.Bitrate, audioProps.Samplerate, audioProps.Channels)
 
+	images := f.ReadImages()
+	for k, v := range images {
+		fmt.Printf("Image %s size: %d\n", k, len(v))
+	}
 }
