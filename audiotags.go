@@ -29,6 +29,7 @@ package audiotags
 */
 import "C"
 import (
+	"encoding/hex"
 	"strings"
 	"unsafe"
 )
@@ -103,6 +104,22 @@ func (f *File) ReadAudioProperties() *AudioProperties {
 	p.Samplerate = int(C.audiotags_audioproperties_samplerate(ap))
 	p.Channels = int(C.audiotags_audioproperties_channels(ap))
 	return &p
+}
+
+func (f *File) ReadImages() map[string][]byte {
+	id := mapsNextId
+	mapsNextId++
+	m := make(map[string]string)
+	maps[id] = m
+	C.audiotags_images((*C.TagLib_File)(f), C.int(id))
+	delete(maps, id)
+	r := make(map[string][]byte, len(m))
+	for k, v := range m {
+		if data, err := hex.DecodeString(v); err == nil {
+			r[k] = data
+		}
+	}
+	return r
 }
 
 var maps = make(map[int]map[string]string)

@@ -30,6 +30,9 @@
 #include <tpropertymap.h>
 #include <string.h>
 #include <typeinfo>
+#include <id3v2tag.h>
+#include <attachedpictureframe.h>
+#include <mpegfile.h>
 
 #include "audiotags.h"
 
@@ -56,6 +59,23 @@ TagLib_File *audiotags_file_new(const char *filename)
 void audiotags_file_close(TagLib_File *file)
 {
   delete reinterpret_cast<TagLib::File *>(file);
+}
+
+void audiotags_images(TagLib_File *file, int id)
+{
+  TagLib::MPEG::File *f = reinterpret_cast<TagLib::MPEG::File *>(file);
+  if (!f->hasID3v2Tag()) {
+      return;
+  }
+  const TagLib::ID3v2::FrameList l = f->ID3v2Tag()->frameList("APIC");
+  for (TagLib::List<TagLib::ID3v2::Frame *>::ConstIterator it = l.begin(); it != l.end(); it++) {
+      const TagLib::ID3v2::AttachedPictureFrame *frame = (TagLib::ID3v2::AttachedPictureFrame *)(*it);
+      char *key = ::strdup(frame->toString().toCString(unicodeStrings));
+      char *val = ::strdup(frame->picture().toHex().data());
+      go_map_put(id, key, val);
+      free(key);
+      free(val);
+  }
 }
 
 void audiotags_file_properties(const TagLib_File *file, int id)

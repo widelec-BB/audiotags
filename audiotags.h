@@ -37,6 +37,7 @@ void audiotags_free(void* pointer);
 TagLib_File *audiotags_file_new(const char *filename);
 void audiotags_file_close(TagLib_File *file);
 void audiotags_file_properties(const TagLib_File *file, int id);
+void audiotags_images(TagLib_File *file, int id);
 const TagLib_AudioProperties *audiotags_file_audioproperties(const TagLib_File *file);
 
 int audiotags_audioproperties_length(const TagLib_AudioProperties *audioProperties);
