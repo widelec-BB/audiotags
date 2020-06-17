@@ -52,13 +52,13 @@ func Open(filename string) (*File, error) {
 	return (*File)(f), nil
 }
 
-func Read(filename string) (map[string]string, *AudioProperties, error) {
+func Read(filename string) (map[string]string, *AudioProperties, map[string][]byte, error) {
 	f, err := Open(filename)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	defer f.Close()
-	return f.ReadTags(), f.ReadAudioProperties(), nil
+	return f.ReadTags(), f.ReadAudioProperties(), f.ReadImages(), nil
 }
 
 func ReadTags(filename string) (map[string]string, error) {
